@@ -23,6 +23,7 @@ This reflection library can be used in conjunction with its plugin mechanism to 
 
 
 - Python
+- JavaScript
 - AngelScript
 - Squirrel
 - C++ (dynamic libraries)
