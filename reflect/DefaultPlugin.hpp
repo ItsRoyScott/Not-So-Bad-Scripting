@@ -14,6 +14,7 @@ namespace reflect
     {
       TypeBuilder() {}
       TypeBuilder(DefaultPlugin&) {}
+
       void Begin(std::string const&, std::string const&) {}
       void End(std::string const&, std::string const&) {}
       template <class Arg0, class... Args>
@@ -28,18 +29,22 @@ namespace reflect
       void NewMemberFunction(std::string const&, Result (Class::*)(Args...)) {}
       template <class Result, class Class, class... Args>
       void NewMemberFunction(std::string const&, Result (Class::*)(Args...) const) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorAddition(std::string const&, Result(Class::*)(Arg) const) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorSubtraction(std::string const&, Result(Class::*)(Arg) const) {}
       template <class GetResult , class GetClass, class SetArg, class SetClass>
       void NewMemberProperty(std::string const&, GetResult (GetClass::*)() const, void (SetClass::*)(SetArg)) {}
       template <class Result, class Class>
       void NewMemberPropertyReadOnly(std::string const&, Result (Class::*)() const) {}
-      template <class Class, class IStream>
-      void NewOperatorExtraction(std::string const&, IStream&(*)(IStream&, Class&)) {}
-      template <class Class, class OStream>
-      void NewOperatorInsertion(std::string const&, OStream&(*)(OStream&, Class&)) {}
       template <class Pointer>
       void NewStaticData(std::string const&, Pointer) {}
       template <class Result, class... Args>
       void NewStaticFunction(std::string const&, Result (*)(Args...)) {}
+      template <class Class, class IStream>
+      void NewStaticOperatorExtraction(std::string const&, IStream&(*)(IStream&, Class&)) {}
+      template <class Class, class OStream>
+      void NewStaticOperatorInsertion(std::string const&, OStream&(*)(OStream&, Class&)) {}
       template < class GetResult, class SetArg>
       void NewStaticProperty(std::string const&, GetResult(*)(), void(*)(SetArg)) {}
       template <class GetResult>

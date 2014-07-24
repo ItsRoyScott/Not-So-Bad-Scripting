@@ -214,6 +214,10 @@ namespace reflect
     }
   };
 
-  static struct ReadOnly_* ReadOnly = nullptr;
-  static struct WriteOnly_* WriteOnly = nullptr;
+  static struct Addition_     * const TagAddition    = nullptr;
+  static struct Destructor_   * const TagDestructor  = nullptr;
+  static struct LeftShift_    * const TagLeftShift   = nullptr;
+  static struct ReadOnly_     * const TagReadOnly    = nullptr;
+  static struct RightShift_   * const TagRightShift  = nullptr;
+  static struct WriteOnly_    * const TagWriteOnly   = nullptr;
 } // namespace reflect

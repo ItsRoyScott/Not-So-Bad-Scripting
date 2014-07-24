@@ -151,7 +151,7 @@ namespace reflect
 
     // Adds a static destructor given its pointer.
     template <class T, class... Args>
-    void Add(void(*ptr)(This), DestructorTag, Args&&... args)
+    void Add(void(*ptr)(This), struct Destructor_*, Args&&... args)
     {
       if (ptr)
       {
@@ -219,10 +219,10 @@ namespace reflect
 
     // Extraction operator
     template <class T, class IStream, class Object, class... Args>
-    void Add(IStream&(*ptr)(IStream&, Object), OperatorExtractionTag, Args&&... args)
+    void Add(IStream&(*ptr)(IStream&, Object), struct RightShift_*, Args&&... args)
     {
       std::string opName = "operator<<";
-      detail::NotifyTypeBuilders<T>().NewOperatorExtraction(name, ptr);
+      detail::NotifyTypeBuilders<T>().NewStaticOperatorExtraction(name, ptr);
       methods.emplace_back(std::move(opName), ptr);
       Add<T>(std::forward<Args>(args)...);
     }

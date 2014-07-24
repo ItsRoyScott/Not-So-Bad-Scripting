@@ -54,11 +54,11 @@ namespace reflect
         "i", &T::i,
         "__add", &T::operator+,
         "I", Const(&T::I), NonConst(&T::I),
-        "IReadOnly", &T::IReadOnly, ReadOnly,
+        "IReadOnly", &T::IReadOnly, TagReadOnly,
         "si", &T::si,
         "Subtract", &T::Subtract,
         "SI", Overloaded0(&T::SI), Overloaded1(&T::SI),
-        "SIReadOnly", CFunction<int()>([]() -> int { return T::SIReadOnly(); }), ReadOnly
+        "SIReadOnly", CFunction<int()>([]() -> int { return T::SIReadOnly(); }), TagReadOnly
       );
     }
   };

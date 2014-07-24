@@ -137,8 +137,8 @@ namespace reflect
         std::move(fullName),
         Constructor<>(),
         Constructor<T const&>(),
-        Destructor(), DestructorTag{},
-        OperatorExtractionHelper<std::istream>::template Get<T&>(), OperatorExtractionTag{},
+        Destructor(), TagDestructor,
+        RightShift<std::istream, T&>(), TagRightShift,
         std::forward<Args>(args)...);
     }
 
@@ -200,7 +200,7 @@ namespace reflect
     }
 
     template <class IStream>
-    struct OperatorExtractionHelper
+    struct RightShiftHelper
     {
       template <class Object, class = decltype(std::declval<IStream&>() >> std::declval<Object>())>
       static auto Get() -> IStream&(*)(IStream&, Object)
@@ -214,6 +214,12 @@ namespace reflect
         return nullptr;
       }
     };
+
+    template <class IStream, class Object>
+    static auto RightShift() -> IStream&(*)(IStream&, Object)
+    {
+      return RightShiftHelper<IStream>::template Get<Object>();
+    }
   };
   template <class Type> typename BindingBase<Type>::AutoBind BindingBase<Type>::autoBind;
 

@@ -87,16 +87,11 @@ namespace reflect
     return fn;
   }
 
-  struct DestructorTag {};
-
   template <class ClassT, class RetT, class... Args>
   auto NonConst(RetT(ClassT::*fn)(Args...)) -> decltype(fn)
   {
     return fn;
   }
-
-  struct OperatorExtractionTag {};
-  struct OperatorInsertionTag {};
 
   template <class... Args>
   struct Overloaded

@@ -112,20 +112,6 @@ namespace reflect
         NotifyTypeBuilders<T, N - 1>().NewMemberPropertyReadOnly(name, getter);
         Plugin<N - 1>::template GetTypeBuilder<T, IsClass>().NewMemberPropertyReadOnly(name, getter);
       }
-      // NewOperatorExtraction
-      template <class Func>
-      void NewOperatorExtraction(std::string const& name, Func const& fn)
-      {
-        NotifyTypeBuilders<T, N - 1>().NewOperatorExtraction(name, fn);
-        Plugin<N - 1>::template GetTypeBuilder<T, IsClass>().NewOperatorExtraction(name, fn);
-      }
-      // NewOperatorInsertion
-      template <class Func>
-      void NewOperatorInsertion(std::string const& name, Func const& fn)
-      {
-        NotifyTypeBuilders<T, N - 1>().NewOperatorInsertion(name, fn);
-        Plugin<N - 1>::template GetTypeBuilder<T, IsClass>().NewOperatorInsertion(name, fn);
-      }
       // NewStaticData
       template <class DataPtr>
       void NewStaticData(std::string const& name, DataPtr const& ptr)
@@ -139,6 +125,20 @@ namespace reflect
       {
         NotifyTypeBuilders<T, N - 1>().NewStaticFunction(name, fn);
         Plugin<N - 1>::template GetTypeBuilder<T, IsClass>().NewStaticFunction(name, fn);
+      }
+      // NewStaticOperatorExtraction
+      template <class Func>
+      void NewStaticOperatorExtraction(std::string const& name, Func const& fn)
+      {
+        NotifyTypeBuilders<T, N - 1>().NewStaticOperatorExtraction(name, fn);
+        Plugin<N - 1>::template GetTypeBuilder<T, IsClass>().NewStaticOperatorExtraction(name, fn);
+      }
+      // NewStaticOperatorInsertion
+      template <class Func>
+      void NewStaticOperatorInsertion(std::string const& name, Func const& fn)
+      {
+        NotifyTypeBuilders<T, N - 1>().NewStaticOperatorInsertion(name, fn);
+        Plugin<N - 1>::template GetTypeBuilder<T, IsClass>().NewStaticOperatorInsertion(name, fn);
       }
       // NewStaticProperty
       template <class Getter, class Setter>
@@ -177,24 +177,26 @@ namespace reflect
       void NewMemberFunction(std::string const&, Result(Class::*)(Args...)) {}
       template <class Result, class Class, class... Args>
       void NewMemberFunction(std::string const&, Result(Class::*)(Args...) const) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorAddition(std::string const&, Result(Class::*)(Arg) const) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorSubtraction(std::string const&, Result(Class::*)(Arg) const) {}
       template <class GetResult, class GetClass, class SetArg, class SetClass>
       void NewMemberProperty(std::string const&, GetResult(GetClass::*)() const, void (SetClass::*)(SetArg)) {}
       template <class Result, class Class>
       void NewMemberPropertyReadOnly(std::string const&, Result(Class::*)() const) {}
-      template <class Class, class IStream>
-      void NewOperatorExtraction(std::string const&, IStream&(*)(IStream&, Class&)) {}
-      template <class Class, class OStream>
-      void NewOperatorInsertion(std::string const&, OStream&(*)(OStream&, Class&)) {}
       template <class Pointer>
       void NewStaticData(std::string const&, Pointer) {}
       template <class Result, class... Args>
       void NewStaticFunction(std::string const&, Result(*)(Args...)) {}
-      template <class GetResult, class SetArg>
+      template <class Class, class IStream>
+      void NewStaticOperatorExtraction(std::string const&, IStream&(*)(IStream&, Class&)) {}
+      template <class Class, class OStream>
+      void NewStaticOperatorInsertion(std::string const&, OStream&(*)(OStream&, Class&)) {}
+      template < class GetResult, class SetArg>
       void NewStaticProperty(std::string const&, GetResult(*)(), void(*)(SetArg)) {}
-      template <class Result>
-      void NewStaticPropertyReadOnly(std::string const&, Result(*)()) {}
       template <class GetResult>
-      void NewStaticPropertyReadOnly(std::string const&, std::function<GetResult()> const&) {}
+      void NewStaticPropertyReadOnly(std::string const&, GetResult(*)()) {}
     };
 
   } // namespace detail
