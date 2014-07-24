@@ -17,7 +17,7 @@
 
 // List of plugin types: add a backslash to the previous line,
 //  then write `,MyPluginType` to hook in `MyPluginType`.
-#define REFLECT_PLUGIN_LIST \
+#define REFLECT_PLUGIN_LIST reflect::DefaultPlugin \
   REFLECT_LUA_PLUGIN_LIST_ENTRY
 
 #include "PluginHelper.hpp"
