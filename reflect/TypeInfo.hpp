@@ -114,7 +114,7 @@ namespace reflect
 
     // Adds a static copy constructor given its name pointer.
     template <class T, class... Args>
-    void Add(void(*ptr)(This, T const&), Args&&... args)
+    void Add(void(*ptr)(void*, T const&), struct Constructor_*, Args&&... args)
     {
       if (ptr)
       {
@@ -126,7 +126,7 @@ namespace reflect
 
     // Adds a static default constructor given its pointer.
     template <class T, class... Args>
-    void Add(void(*ptr)(This), Args&&... args)
+    void Add(void(*ptr)(void*), struct Constructor_*, Args&&... args)
     {
       if (ptr)
       {
@@ -139,7 +139,7 @@ namespace reflect
     // Adds a static constructor given its pointer.
     template <class T, class CtorArg0, class... CtorArgs, class... Args>
     typename std::enable_if<!std::is_same<CtorArg0, T const&>::value>::type
-      Add(void(*ptr)(This, CtorArg0, CtorArgs...), Args&&... args)
+      Add(void(*ptr)(void*, CtorArg0, CtorArgs...), struct Constructor_*, Args&&... args)
     {
       if (ptr)
       {
@@ -151,7 +151,7 @@ namespace reflect
 
     // Adds a static destructor given its pointer.
     template <class T, class... Args>
-    void Add(void(*ptr)(This), struct Destructor_*, Args&&... args)
+    void Add(void(*ptr)(void*), struct Destructor_*, Args&&... args)
     {
       if (ptr)
       {
@@ -255,6 +255,146 @@ namespace reflect
       Add<T>(std::forward<Args>(args)...);
     }
 
+    // Binds a const modulo method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result(Class::*fn)(Param) const, struct Modulo_*, Args&&... args)
+    {
+      std::string name = "operator%";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorModulo(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const AND method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result(Class::*fn)(Param) const, struct And_*, Args&&... args)
+    {
+      std::string name = "operator&";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorAnd(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const OR method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result(Class::*fn)(Param) const, struct Or_*, Args&&... args)
+    {
+      std::string name = "operator|";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorOr(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const XOR method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result(Class::*fn)(Param) const, struct Xor_*, Args&&... args)
+    {
+      std::string name = "operator^";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorXor(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const unary plus method to the type.
+    template <class T, class Result, class Class, class... Args>
+    void Add(Result(Class::*fn)() const, struct Plus_*, Args&&... args)
+    {
+      std::string name = "operator+";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorUnaryPlus(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const unary minus method to the type.
+    template <class T, class Result, class Class, class... Args>
+    void Add(Result(Class::*fn)() const, struct Minus_*, Args&&... args)
+    {
+      std::string name = "operator-";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorUnaryMinus(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const addition method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result(Class::*fn)(Param) const, struct Plus_*, Args&&... args)
+    {
+      std::string name = "operator+";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorAddition(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const subtraction method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result(Class::*fn)(Param) const, struct Minus_*, Args&&... args)
+    {
+      std::string name = "operator-";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorSubtraction(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const multiplication method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result(Class::*fn)(Param) const, struct Multiplication_*, Args&&... args)
+    {
+      std::string name = "operator*";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorMultiplication(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a const division method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result(Class::*fn)(Param) const, struct Division_*, Args&&... args)
+    {
+      std::string name = "operator/";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorDivision(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a assignment addition method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result&(Class::*fn)(Param), struct Plus_*, Args&&... args)
+    {
+      std::string name = "operator+=";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorAssignAddition(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a assignment subtraction method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result&(Class::*fn)(Param), struct Minus_*, Args&&... args)
+    {
+      std::string name = "operator-=";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorAssignSubtraction(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a assignment multiplication method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result&(Class::*fn)(Param), struct Multiplication_*, Args&&... args)
+    {
+      std::string name = "operator*=";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorAssignMultiplication(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
+    // Binds a assignment division method to the type.
+    template <class T, class Result, class Class, class Param, class... Args>
+    void Add(Result&(Class::*fn)(Param), struct Division_*, Args&&... args)
+    {
+      std::string name = "operator/=";
+      detail::NotifyTypeBuilders<T>().NewMemberOperatorAssignDivision(name, fn);
+      methods.emplace_back(move(name), fn);
+      Add<T>(std::forward<Args>(args)...);
+    }
+
     // Calls Add functions recursively to initialize the type.
     template <class T, class... Args>
     void Bind(std::string const& fullName, Args&&... args)
@@ -262,8 +402,8 @@ namespace reflect
       size_t scope = fullName.rfind("::");
 
       cppType = &typeid(T);
-      name = scope == std::string::npos ? fullName : fullName.substr(scope + 2);
-      namespaceName = scope == std::string::npos ? std::string() : fullName.substr(0, scope);
+      name = (scope == std::string::npos ? fullName : fullName.substr(scope + 2));
+      namespaceName = (scope == std::string::npos ? std::string() : fullName.substr(0, scope));
 
       detail::NotifyTypeBuilders<T>().Begin(name, namespaceName);
 

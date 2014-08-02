@@ -61,8 +61,7 @@ namespace reflect
       name(move(name_)),
       getFieldPointer([=](void*) -> void* { return fieldPtr; }),
       type(&TypeOf<FieldT>())
-    {
-    }
+    {}
 
     // Constructs given the field's name and member pointer.
     template <class FieldT, class T>
@@ -75,17 +74,6 @@ namespace reflect
       {
         FieldT& field = (reinterpret_cast<T*>(this_)->*fieldPtr);
         return &field;
-      };
-
-      getter = [=](void* this_, void* data)
-      {
-        *reinterpret_cast<FieldT*>(data) = (reinterpret_cast<T*>(this_)->*fieldPtr);
-      };
-
-      setter = [=](void* this_, void* other)
-      {
-        FieldT& field = (reinterpret_cast<T*>(this_)->*fieldPtr);
-        field = *reinterpret_cast<FieldT*>(other);
       };
     }
 
@@ -212,12 +200,43 @@ namespace reflect
       if (&TypeOf<FieldT>() != type) return nullptr;
       return reinterpret_cast<FieldT*>(getFieldPointer(&this_));
     }
+
+    template <class T, class Arg>
+    bool Set(Arg const& value, void* this_ = nullptr) const
+    {
+      if (&TypeOf<T>() != type) return false;
+
+      T const& rval = static_cast<T const&>(value);
+
+      if (getFieldPointer)
+      {
+        auto ptr = reinterpret_cast<detail::decayed<T>*>(getFieldPointer(this_));
+        *ptr = rval;
+        return true;
+      }
+
+      if (setter)
+      {
+        setter(this_, const_cast<T*>(&rval));
+        return true;
+      }
+
+      return false;
+    }
   };
 
-  static struct Addition_     * const TagAddition    = nullptr;
-  static struct Destructor_   * const TagDestructor  = nullptr;
-  static struct LeftShift_    * const TagLeftShift   = nullptr;
-  static struct ReadOnly_     * const TagReadOnly    = nullptr;
-  static struct RightShift_   * const TagRightShift  = nullptr;
-  static struct WriteOnly_    * const TagWriteOnly   = nullptr;
+  static struct And_            * const TagAnd            = nullptr;
+  static struct Constructor_    * const TagConstructor    = nullptr;
+  static struct Destructor_     * const TagDestructor     = nullptr;
+  static struct Division_       * const TagDivision       = nullptr;
+  static struct LeftShift_      * const TagLeftShift      = nullptr;
+  static struct Minus_          * const TagMinus          = nullptr;
+  static struct Modulo_         * const TagModulo         = nullptr;
+  static struct Multiplication_ * const TagMultiplication = nullptr;
+  static struct Or_             * const TagOr             = nullptr;
+  static struct Plus_           * const TagPlus           = nullptr;
+  static struct ReadOnly_       * const TagReadOnly       = nullptr;
+  static struct RightShift_     * const TagRightShift     = nullptr;
+  static struct WriteOnly_      * const TagWriteOnly      = nullptr;
+  static struct Xor_            * const TagXor            = nullptr;
 } // namespace reflect

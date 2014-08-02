@@ -11,19 +11,20 @@ namespace reflect
   {
   private: // data
 
-    std::unordered_map<std::string, NamespaceInfo> namespaces;
+    NamespaceInfo globalNamespace;
 
     std::unordered_map<std::string, const TypeInfo*> types;
 
   public: // properties
 
-    std::unordered_map<std::string, NamespaceInfo> const& Namespaces = namespaces;
+    NamespaceInfo const& GlobalNamespace = globalNamespace;
 
     std::unordered_map<std::string, const TypeInfo*> const& Types = types;
 
   public: // methods
 
-    Reflection()
+    Reflection() :
+      globalNamespace("", "")
     {
       // Register void.
       types["void"] = &TypeOf<void>();
@@ -45,6 +46,13 @@ namespace reflect
       RegisterFundamentalType<unsigned long long>();
     }
 
+    template <class... Args>
+    void BindNamespace(std::string const& fullName, Args&&... args)
+    {
+      NamespaceInfo& info = GetNamespace(fullName);
+      info.Bind(fullName, std::forward<Args>(args)...);
+    }
+
     template <class T>
     void BindType()
     {
@@ -54,6 +62,19 @@ namespace reflect
       TypeInfo& type = detail::TypeOf<T>();
       Binding<T>{};
       types[type.Name] = &type;
+    }
+
+    NamespaceInfo& GetNamespace(std::string const& fullName)
+    {
+      auto splitName = SplitQualifiedName(fullName);
+      NamespaceInfo* namespace_ = &globalNamespace;
+
+      for (std::string const& namespaceName : splitName)
+      {
+        namespace_ = &namespace_->GetNamespace(namespaceName);
+      }
+
+      return *namespace_;
     }
 
     static Reflection& Instance()
@@ -90,11 +111,27 @@ namespace reflect
       type.name = typeid(T).name();
       types[type.Name] = &type;
 
-      // Add the default and copy constructor.
-      //type.methods.emplace_back(type.name, ConstructorFunction<T>);
-      //type.methods.emplace_back(type.name, ConstructorFunction<T, const T&>);
-
       return type;
+    }
+
+    static std::vector<std::string> SplitQualifiedName(std::string name)
+    {
+      std::vector<std::string> vec;
+
+      // For each scope qualification "::":
+      for (auto colon = name.find("::"); colon != name.npos; colon = name.find("::"))
+      {
+        // Push back the substring before the scope.
+        vec.push_back(name.substr(0, colon));
+
+        // Update the substring to be the rest.
+        name = name.substr(colon + 2);
+      }
+
+      // Push back the last part of the name.
+      vec.push_back(name);
+
+      return std::move(vec);
     }
   };
 
@@ -135,11 +172,18 @@ namespace reflect
     {
       detail::TypeOf<T>().template Bind<T>(
         std::move(fullName),
-        Constructor<>(),
-        Constructor<T const&>(),
+        Constructor<>(), TagConstructor,
+        Constructor<T const&>(), TagConstructor,
         Destructor(), TagDestructor,
         RightShift<std::istream, T&>(), TagRightShift,
         std::forward<Args>(args)...);
+    }
+
+    // Binds members of a namespace.
+    template <class... Args>
+    static void BindNamespace(std::string const& fullName, Args&&... args)
+    {
+      Reflection::Instance().BindNamespace(fullName, std::forward<Args>(args)...);
     }
 
   protected: // methods
@@ -150,25 +194,25 @@ namespace reflect
     {
       // Returns a C-style function pointer to the constructor.
       template <class U, class = decltype( U(std::declval<Args>()...) )>
-      static auto Get() -> void(*)(This, Args...)
+      static auto Get() -> void(*)(void*, Args...)
       {
-        return [](This this_, Args... args) 
+        return [](void* this_, Args... args) 
         { 
-          new (this_.ptr) T(std::forward<Args>(args)...);
+          new (this_) T(std::forward<Args>(args)...);
         };
       }
 
       // Returns nullptr, because the requested constructor does not exist
       //  or is not accessible from the current context.
       template <class U, class... Ignored>
-      static auto Get(Ignored..., ...) -> void(*)(This, Args...)
+      static auto Get(Ignored..., ...) -> void(*)(void*, Args...)
       {
         return nullptr;
       }
     };
 
     template <class... Args>
-    static auto Constructor() -> void(*)(This, Args...)
+    static auto Constructor() -> void(*)(void*, Args...)
     {
       return ConstructorHelper<Args...>::template Get<T>();
     }
@@ -178,23 +222,23 @@ namespace reflect
     {
       // Returns a C-style function pointer to the destructor.
       template <class U, class = typename std::enable_if<std::is_destructible<U>::value>::type>
-      static auto Get() -> void(*)(This)
+      static auto Get() -> void(*)(void*)
       {
-        return [](This this_) 
+        return [](void* this_) 
         {
-          reinterpret_cast<T*>(this_.ptr)->~T();
+          reinterpret_cast<T*>(this_)->~T();
         };
       }
 
       // Returns nullptr, because the destructor is inaccessible.
       template <class U, class... Ignored>
-      static auto Get(Ignored..., ...) -> void(*)(This)
+      static auto Get(Ignored..., ...) -> void(*)(void*)
       {
         return nullptr;
       }
     };
 
-    static auto Destructor() -> void(*)(This)
+    static auto Destructor() -> void(*)(void*)
     {
       return DestructorHelper::template Get<T>();
     }

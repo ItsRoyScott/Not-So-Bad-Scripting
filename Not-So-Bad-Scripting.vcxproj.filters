@@ -123,7 +123,7 @@
     <ClInclude Include="lua\RefCountedPtr.h">
       <Filter>lua</Filter>
     </ClInclude>
-    <ClInclude Include="lua\ReflectionPlugin.hpp">
+    <ClInclude Include="lua\_ReflectionPlugin.hpp">
       <Filter>lua</Filter>
     </ClInclude>
   </ItemGroup>

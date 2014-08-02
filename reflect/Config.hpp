@@ -12,7 +12,7 @@
 // Includes for all plugins: include your custom plugin here.
 #include "DefaultPlugin.hpp"
 #ifndef REFLECT_NO_LUA
-  #include "lua/ReflectionPlugin.hpp"
+  #include "lua/_ReflectionPlugin.hpp"
 #endif
 
 // List of plugin types: add a backslash to the previous line,

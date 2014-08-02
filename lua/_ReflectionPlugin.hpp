@@ -83,10 +83,10 @@ namespace Lua
     {
     private: // data
 
-      typedef Namespace::Class<T> Class;
+      typedef luabridge::Namespace::Class<T> Class;
 
       Class* class_ = nullptr;
-      Namespace* namespace_ = nullptr;
+      luabridge::Namespace* namespace_ = nullptr;
 
     public: // methods
 
@@ -94,7 +94,7 @@ namespace Lua
 
       void Begin(std::string const& className, std::string const& namespaceName)
       {
-        namespace_ = new Namespace(luabridge::getGlobalNamespace(L()).beginNamespace(namespaceName.c_str()));
+        namespace_ = new luabridge::Namespace(luabridge::getGlobalNamespace(L()).beginNamespace(namespaceName.c_str()));
         class_ = new Class(namespace_->beginClass<T>(className.c_str()));
       }
 
@@ -105,7 +105,7 @@ namespace Lua
         delete namespace_;
       }
 
-      void NewDefaultConstructor(std::string const&, void(*)(This))
+      void NewDefaultConstructor(std::string const&, void(*)(void*))
       {
         class_->template addConstructor<void(*)()>();
       }
@@ -120,6 +120,42 @@ namespace Lua
       void NewMemberFunction(std::string const& name, FuncPtr const& fn)
       {
         class_->addFunction(name.c_str(), fn);
+      }
+
+      template <class Func>
+      void NewMemberOperatorAddition(std::string const&, Func const& fn)
+      {
+        class_->addFunction("__add", fn);
+      }
+
+      template <class Func>
+      void NewMemberOperatorDivision(std::string const&, Func const& fn)
+      {
+        class_->addFunction("__div", fn);
+      }
+
+      template <class Func>
+      void NewMemberOperatorModulo(std::string const&, Func const& fn)
+      {
+        class_->addFunction("__mod", fn);
+      }
+
+      template <class Func>
+      void NewMemberOperatorMultiplication(std::string const&, Func const& fn)
+      {
+        class_->addFunction("__mul", fn);
+      }
+
+      template <class Func>
+      void NewMemberOperatorSubtraction(std::string const&, Func const& fn)
+      {
+        class_->addFunction("__sub", fn);
+      }
+
+      template <class Func>
+      void NewMemberOperatorXor(std::string const&, Func const& fn)
+      {
+        class_->addFunction("__pow", fn);
       }
 
       template <class Getter, class Setter>

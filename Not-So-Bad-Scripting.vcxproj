@@ -116,7 +116,7 @@
     <ClInclude Include="lua\lundump.h" />
     <ClInclude Include="lua\lvm.h" />
     <ClInclude Include="lua\lzio.h" />
-    <ClInclude Include="lua\ReflectionPlugin.hpp" />
+    <ClInclude Include="lua\_ReflectionPlugin.hpp" />
     <ClInclude Include="lua\RefCountedObject.h" />
     <ClInclude Include="lua\RefCountedPtr.h" />
     <ClInclude Include="reflect\Config.hpp" />

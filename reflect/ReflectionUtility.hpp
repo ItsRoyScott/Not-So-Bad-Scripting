@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <functional>
 #include <iosfwd>
 #include <unordered_map>
@@ -70,10 +71,82 @@ namespace reflect // types
     using index_sequence_for = typename make_index_sequence<sizeof...(Args)>::type;
   } // namespace detail
 
-  // Special type to signify a 'this' pointer.
-  struct This
+  // Wraps a const version of a map for public user access.
+  template <class Key, class Value>
+  struct ConstMapWrapper
   {
-    void* ptr = nullptr;
+    typedef std::unordered_map<Key, Value> MapType;
+    MapType* data;
+
+    // Initializes from a reference to a map.
+    ConstMapWrapper(MapType& map) :
+      data(&map)
+    {}
+
+    // Begin const_iterator.
+    auto begin() const -> decltype(data->cbegin())
+    {
+      return data->cbegin();
+    }
+
+    // End const_iterator.
+    auto end() const -> decltype(data->cend())
+    {
+      return data->cend();
+    }
+
+    // Find an item by key.
+    auto find(Key const& key) const -> decltype(data->cbegin())
+    {
+      return data->find(key);
+    }
+
+    // Access a value by key.
+    Value const& operator[](Key const& key) const
+    {
+      auto it = find(key);
+      assert(it != end() && "Key not found");
+      return it->second;
+    }
+  };
+
+  // Wraps a const version of a map for public user access. (for pointer values)
+  template <class Key, class Value>
+  struct ConstMapWrapper<Key, Value*>
+  {
+    typedef std::unordered_map<Key, Value*> MapType;
+    MapType* data;
+
+    // Initializes from a reference to a map.
+    ConstMapWrapper(MapType& map) :
+      data(&map)
+    {}
+
+    // Begin const_iterator.
+    auto begin() const -> decltype(data->cbegin())
+    {
+      return data->cbegin();
+    }
+
+    // End const_iterator.
+    auto end() const -> decltype(data->cend())
+    {
+      return data->cend();
+    }
+
+    // Find an item by key.
+    auto find(Key const& key) const -> decltype(data->cbegin())
+    {
+      return data->find(key);
+    }
+
+    // Access a value by key.
+    Value const& operator[](Key const& key) const
+    {
+      auto it = find(key);
+      assert(it != end() && "Key not found");
+      return *it->second;
+    }
   };
 
   // Creates a vector of TypeInfo pointers given a sequence of types.

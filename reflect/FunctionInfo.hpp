@@ -74,7 +74,7 @@ namespace reflect
       typedef FunctionTraits<CallT> Traits;
 
       // Verify the call type is correct.
-      if (cFunctionType != typeid(Traits::CFunctionType)) return{};
+      if (cFunctionType != typeid(typename Traits::CFunctionType)) return{};
 
       // Reinterpret cast to the requested function type.
       return detail::CastFunction<void(), CallT>(func);

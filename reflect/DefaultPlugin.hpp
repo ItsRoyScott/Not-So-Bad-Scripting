@@ -18,21 +18,41 @@ namespace reflect
       void Begin(std::string const&, std::string const&) {}
       void End(std::string const&, std::string const&) {}
       template <class Arg0, class... Args>
-      void NewConstructor(std::string const&, void(*)(This, Arg0, Args...)) {}
+      void NewConstructor(std::string const&, void(*)(void*, Arg0, Args...)) {}
       void NewCopyAssign(std::string const&, T&(*)(T&, T const&)) {}
-      void NewCopyConstructor(std::string const&, void(*)(This, T const&)) {}
-      void NewDefaultConstructor(std::string const&, void(*)(This)) {}
-      void NewDestructor(std::string const&, void(*)(This)) {}
+      void NewCopyConstructor(std::string const&, void(*)(void*, T const&)) {}
+      void NewDefaultConstructor(std::string const&, void(*)(void*)) {}
+      void NewDestructor(std::string const&, void(*)(void*)) {}
       template <class Class, class Data>
       void NewMemberData(std::string const&, Data Class::*) {}
       template <class Result, class Class, class... Args>
       void NewMemberFunction(std::string const&, Result (Class::*)(Args...)) {}
       template <class Result, class Class, class... Args>
-      void NewMemberFunction(std::string const&, Result (Class::*)(Args...) const) {}
+      void NewMemberFunction(std::string const&, Result(Class::*)(Args...) const) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorAssignAddition(std::string const&, Result(Class::*)(Arg)) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorAssignDivision(std::string const&, Result(Class::*)(Arg)) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorAssignMultiplication(std::string const&, Result(Class::*)(Arg)) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorAssignSubtraction(std::string const&, Result(Class::*)(Arg)) {}
       template <class Result, class Class, class Arg>
       void NewMemberOperatorAddition(std::string const&, Result(Class::*)(Arg) const) {}
       template <class Result, class Class, class Arg>
+      void NewMemberOperatorDivision(std::string const&, Result(Class::*)(Arg) const) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorModulo(std::string const&, Result(Class::*)(Arg) const) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorMultiplication(std::string const&, Result(Class::*)(Arg) const) {}
+      template <class Result, class Class, class Arg>
       void NewMemberOperatorSubtraction(std::string const&, Result(Class::*)(Arg) const) {}
+      template <class Result, class Class>
+      void NewMemberOperatorUnaryMinus(std::string const&, Result(Class::*)() const) {}
+      template <class Result, class Class>
+      void NewMemberOperatorUnaryPlus(std::string const&, Result(Class::*)() const) {}
+      template <class Result, class Class, class Arg>
+      void NewMemberOperatorXor(std::string const&, Result(Class::*)(Arg) const) {}
       template <class GetResult , class GetClass, class SetArg, class SetClass>
       void NewMemberProperty(std::string const&, GetResult (GetClass::*)() const, void (SetClass::*)(SetArg)) {}
       template <class Result, class Class>
